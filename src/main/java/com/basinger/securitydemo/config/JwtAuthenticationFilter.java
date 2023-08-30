@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,17 +20,16 @@ import java.io.IOException;
 
 
 @Component
-//@RequiredArgsConstructor // Will create constructor for any final private field
+@RequiredArgsConstructor // Will create constructor for any final private field
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
+/*    @Autowired
     public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-    }
-
+    }*/
 
     @Override
     protected void doFilterInternal(
@@ -41,21 +41,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String customAuthHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
-        // If the header is null
+/*        // If the header is null
         // OR
-        // If the header doesn't start with "Bearer "
+        // If the header doesn't start with "Bearer "*/
         if (customAuthHeader == null || !customAuthHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request,response);
             return;
         }
-
         jwt = customAuthHeader.substring(7);
         userEmail =  jwtService.extractUsername(jwt);
-
         // Check if user is already authenticated
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-
 /*          // 1:24
             // If token for the user is still valid
             // Update the SecurityContextHolder
